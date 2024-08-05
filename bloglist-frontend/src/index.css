@@ -1,0 +1,11 @@
+* {
+  margin: 0.5em;
+}
+
+.notification {
+    background: rgb(200, 200, 200);
+    font-size: 1.25em;
+    border-style: solid;
+    border-radius: 0.2em;
+    padding: 0.5em;
+}

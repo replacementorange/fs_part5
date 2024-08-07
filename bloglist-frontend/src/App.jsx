@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react' // useRef hook is used to create a blogFormRef reference (toggable component)
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import CreateBlog from './components/CreateBlog'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -14,6 +15,8 @@ const App = () => {
   const [style, setStyle] = useState()
   const [user, setUser] = useState(null)
   const [newBlog, setNewBlog] = useState({title: '', author: '', url: ''})
+  // https://fullstackopen.com/en/part5/props_children_and_proptypes#references-to-components-with-ref
+  const blogFormRef = useRef(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -71,6 +74,7 @@ const App = () => {
       const response = await blogService.create(newBlog)
       setBlogs([...blogs,response])
 
+      blogFormRef.current.toggleVisibility() // VISIBILITY
       setMessage(`a new blog '${newBlog.title}' by ${newBlog.author} has been added`)
       setStyle({ color: 'green'})
       setTimeout(() => {
@@ -126,15 +130,17 @@ const App = () => {
       <h2>blogs</h2>
       <p>Logged in as: <b>{user.name}</b> <button onClick={handleLogout}>Logout</button></p>
 
-      <CreateBlog
-        title={newBlog.title}
-        author={newBlog.author}
-        url={newBlog.url}
-        changeTitle={onChangeTitle}
-        changeAuthor={onChangeAuthor}
-        changeUrl={onChangeUrl}
-        handleCreate={handleCreateBlog}
-      />
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <CreateBlog
+          title={newBlog.title}
+          author={newBlog.author}
+          url={newBlog.url}
+          changeTitle={onChangeTitle}
+          changeAuthor={onChangeAuthor}
+          changeUrl={onChangeUrl}
+          handleCreate={handleCreateBlog}
+        />
+      </Togglable>
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
